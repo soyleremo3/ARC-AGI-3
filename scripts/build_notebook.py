@@ -569,7 +569,7 @@ _DUMMY_SUBMISSION_CELL = dedent(
 def build() -> dict:
     if not AGENT_SRC.exists():
         raise SystemExit(f"Could not find {AGENT_SRC}")
-    agent_body = AGENT_SRC.read_text()
+    agent_body = AGENT_SRC.read_text(encoding="utf-8")
 
     # We write the agent to /tmp/ (not /kaggle/working/) so it does NOT appear
     # as a notebook output. Otherwise the "Submit to Competition" UI would
@@ -627,18 +627,20 @@ def build() -> dict:
 
 def main() -> None:
     NOTEBOOK_PATH.parent.mkdir(parents=True, exist_ok=True)
-    NOTEBOOK_PATH.write_text(json.dumps(build(), indent=1))
+    NOTEBOOK_PATH.write_text(json.dumps(build(), indent=1), encoding="utf-8")
     print(f"[build_notebook] Wrote {NOTEBOOK_PATH.relative_to(ROOT)}  "
           f"(accelerator: {ACCELERATOR})")
 
     # Keep notebooks/kernel-metadata.json in sync so the user never has to
     # edit it just to flip CPU ↔ GPU.
     if METADATA_PATH.exists():
-        meta = json.loads(METADATA_PATH.read_text())
+        meta = json.loads(METADATA_PATH.read_text(encoding="utf-8"))
         wanted = _ACCELERATORS[ACCELERATOR]["gpu"]
         if meta.get("enable_gpu") != wanted:
             meta["enable_gpu"] = wanted
-            METADATA_PATH.write_text(json.dumps(meta, indent=2) + "\n")
+            METADATA_PATH.write_text(
+                json.dumps(meta, indent=2) + "\n", encoding="utf-8"
+            )
             print(f"[build_notebook] Synced enable_gpu={wanted} in "
                   f"{METADATA_PATH.relative_to(ROOT)}")
 

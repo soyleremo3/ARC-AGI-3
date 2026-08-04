@@ -1119,12 +1119,21 @@ class MyAgent(Agent):
         }
         if choice_count > 1:
             request_kwargs["n"] = max(1, min(5, int(choice_count)))
-        if json_mode and os.getenv("VLLM_JSON_MODE", "1").strip().lower() not in {
-            "0",
-            "false",
-            "no",
-            "off",
-        }:
+        # Guided JSON decoding constrains every generated token to the JSON
+        # grammar from the first token. The vLLM server here is started
+        # without --reasoning-parser (see _start_vllm_server), so it has no
+        # way to carve out an unconstrained reasoning span before that
+        # grammar kicks in -- combining the two would either silently starve
+        # the model of any thinking tokens or break the completion outright.
+        # _extract_action_json already scans free-form text for the JSON
+        # object, so drop guided mode whenever thinking is on and lean on
+        # that instead.
+        if (
+            json_mode
+            and not enable_thinking
+            and os.getenv("VLLM_JSON_MODE", "1").strip().lower()
+            not in {"0", "false", "no", "off"}
+        ):
             request_kwargs["response_format"] = {"type": "json_object"}
         remaining = self.game_time_remaining_s
         if remaining <= 0:
