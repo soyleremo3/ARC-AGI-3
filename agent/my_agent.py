@@ -52,7 +52,7 @@ class MyAgent(Agent):
     GAME_TO_MODEL_ACTION = {
         game_name: model_name for model_name, game_name in MODEL_TO_GAME_ACTION.items()
     }
-    MAX_ACTIONS = 200
+    _DEFAULT_MAX_ACTIONS = 200
     # Submission safety limits, matching the official GPT-OSS template style.
     # Swarm runs one thread per game; each thread must finish so the scorecard can close.
     GAME_TIME_LIMIT_S = 8 * 60 * 60
@@ -461,6 +461,13 @@ class MyAgent(Agent):
                 return log_file.read().decode("utf-8", errors="replace").strip()
         except OSError as exc:
             return f"Unable to read vLLM log: {exc}"
+
+    @property
+    def MAX_ACTIONS(self) -> int:
+        try:
+            return max(1, int(os.getenv("AGENT_MAX_ACTIONS", str(self._DEFAULT_MAX_ACTIONS))))
+        except ValueError:
+            return self._DEFAULT_MAX_ACTIONS
 
     @property
     def game_elapsed_s(self) -> float:
