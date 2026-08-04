@@ -131,13 +131,14 @@ twice.
 
 ### Choosing an accelerator
 
-The notebook is generated with a **T4 GPU** by default (matches Kaggle's
-sample submission). To change it, open
+The notebook is generated with an **RTX PRO 6000** by default — this repo's
+`agent/my_agent.py` serves a 31B-parameter model (gemma-4-31b-it) through
+vLLM, which does not fit on t4/p100. To change it, open
 [`scripts/build_notebook.py`](scripts/build_notebook.py) and edit **one
 line** near the top:
 
 ```python
-ACCELERATOR = "t4"     # change "t4" to one of: cpu, t4, p100, rtx6000
+ACCELERATOR = "rtx6000"     # change to one of: cpu, t4, p100, rtx6000
 ```
 
 Then re-run `make submit`. That's it — both the notebook metadata and
