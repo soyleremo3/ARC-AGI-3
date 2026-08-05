@@ -14,8 +14,17 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import logging
+import os
 import sys
 from pathlib import Path
+
+# Windows consoles default stdout/stderr to the system codepage (e.g.
+# cp1252), which can't encode the arrow/dash characters used below and
+# crashes with UnicodeEncodeError. Force UTF-8 so this runs the same on
+# Windows, macOS, and Linux.
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -86,8 +95,16 @@ def main() -> None:
               f"(this is what Kaggle does in competition rerun).\n")
 
     MyAgentCls = load_my_agent_class()
-    if hasattr(MyAgentCls, "MAX_ACTIONS"):
-        MyAgentCls.MAX_ACTIONS = min(MyAgentCls.MAX_ACTIONS, args.max_steps)
+    # MAX_ACTIONS is a property backed by the AGENT_MAX_ACTIONS env var (so a
+    # running Kaggle submission can tune it without a code change), not a
+    # plain class attribute -- assigning MyAgentCls.MAX_ACTIONS would just
+    # replace the property object itself. Cap it the same way the property
+    # reads it.
+    if hasattr(MyAgentCls, "_DEFAULT_MAX_ACTIONS"):
+        current_default = int(
+            os.environ.get("AGENT_MAX_ACTIONS", MyAgentCls._DEFAULT_MAX_ACTIONS)
+        )
+        os.environ["AGENT_MAX_ACTIONS"] = str(min(current_default, args.max_steps))
 
     per_game = []
     for i, game_id in enumerate(game_ids, 1):
