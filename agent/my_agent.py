@@ -5,6 +5,7 @@ from __future__ import annotations
 # The policy is served locally through vLLM's OpenAI-compatible API.
 # =====================================================================
 import base64
+import difflib
 import hashlib
 import io
 import json
@@ -68,6 +69,8 @@ class MyAgent(Agent):
     ACTION_CONTEXT_FRAMES = 4
     REFLECTION_INTERVAL = 10
     MAX_REFLECTION_CHARS = 1800
+    MAX_SHARED_MECHANISM_CHARS = 4000
+    MAX_SHARED_MECHANISM_PROMPT_CHARS = 500
     MAX_PLAN_ACTIONS = 4
     FRAME_BORDER_IGNORE = 3
     MAX_NEW_TOKENS = 1024
@@ -120,6 +123,10 @@ class MyAgent(Agent):
     _server_process: subprocess.Popen[bytes] | None = None
     _server_log: Any = None
     _server_lock = threading.Lock()
+    # Swarm runs one thread per game concurrently against the same process,
+    # so a cross-game shared file needs its own lock independent of
+    # _server_lock (which guards vLLM client/process state, not files).
+    _shared_mechanism_lock = threading.Lock()
     _vllm_startup_error: str | None = None
     _startup_attempts: int = 0
 
@@ -146,6 +153,12 @@ class MyAgent(Agent):
         self.significant_events: list[dict[str, Any]] = []
         self.reflection_memory_path = self._reflection_memory_path()
         self.reflection_memory = self._load_reflection_memory()
+        # Cross-game hints only -- never a hard action filter. Loaded once
+        # here and refreshed at each reflection cycle (not every action) so
+        # a mechanic another concurrently-running game just confirmed can
+        # still reach this game while it's playing, without adding a file
+        # read to the hot per-action path.
+        self.shared_mechanisms = self._load_shared_mechanisms()
         self.reflections_completed = 0
         self.reflection_failures = 0
         self.current_level_number = 1
@@ -157,7 +170,8 @@ class MyAgent(Agent):
         self._game_started_monotonic = time.monotonic()
         self._deadline_hit = False
 
-    def _reflection_memory_path(self) -> str:
+    @staticmethod
+    def _memory_base_dir() -> str:
         # sys.platform check first: Kaggle's runtime is always Linux, so this
         # never changes real submission behaviour. Without it, a leading "/"
         # is drive-relative on Windows (no path separator translation the way
@@ -169,11 +183,17 @@ class MyAgent(Agent):
             if sys.platform != "win32" and os.path.isdir("/kaggle/working")
             else os.path.join(os.getcwd(), "agent_memory")
         )
-        base_dir = os.getenv("LLM_MEMORY_DIR", default_dir)
+        return os.getenv("LLM_MEMORY_DIR", default_dir)
+
+    def _reflection_memory_path(self) -> str:
         safe_game_id = "".join(
             char if char.isalnum() or char in "-_" else "_" for char in self.game_id
         )
-        return os.path.join(base_dir, f"{safe_game_id}.md")
+        return os.path.join(self._memory_base_dir(), f"{safe_game_id}.md")
+
+    @classmethod
+    def _shared_mechanism_memory_path(cls) -> str:
+        return os.path.join(cls._memory_base_dir(), "_shared_mechanisms.md")
 
     def _load_reflection_memory(self) -> str:
         try:
@@ -184,6 +204,97 @@ class MyAgent(Agent):
         except OSError:
             pass
         return "# Agent Memory\n\nNo reflection has been completed yet."
+
+    def _shared_mechanism_memory_enabled(self) -> bool:
+        return self._env_flag("LLM_SHARED_MECHANISM_MEMORY", "0")
+
+    def _load_shared_mechanisms(self) -> str:
+        if not self._shared_mechanism_memory_enabled():
+            return ""
+        try:
+            with open(
+                self._shared_mechanism_memory_path(), "r", encoding="utf-8"
+            ) as memory_file:
+                return memory_file.read().strip()[: self.MAX_SHARED_MECHANISM_CHARS]
+        except OSError:
+            return ""
+
+    @staticmethod
+    def _looks_like_generalizable_rule(rule_text: str, game_id: str) -> bool:
+        """Reject rules that look tied to this specific game/level.
+
+        Cheap heuristic, not a proof: cross-game notes are hints the prompt
+        already labels as unverified, so a false positive here just adds one
+        unhelpful line rather than actively misleading the model the way a
+        wrong entry in the hard action-failure filters would.
+        """
+        lowered = rule_text.lower()
+        if game_id.lower() in lowered:
+            return False
+        return not any(
+            marker in lowered for marker in ("level ", "this game", "this level")
+        )
+
+    def _extract_confirmed_rules(self, reflection_text: str) -> list[str]:
+        rules: list[str] = []
+        for raw_line in reflection_text.splitlines():
+            line = raw_line.strip().lstrip("-*").strip()
+            if "[CONFIRMED]" in line and self._looks_like_generalizable_rule(
+                line, self.game_id
+            ):
+                rules.append(line)
+        return rules
+
+    @staticmethod
+    def _is_similar_to_existing(candidate: str, existing_text: str, threshold: float = 0.6) -> bool:
+        candidate_norm = candidate.strip().lower()
+        for existing_line in existing_text.splitlines():
+            existing_norm = existing_line.strip().lower()
+            if not existing_norm:
+                continue
+            if difflib.SequenceMatcher(None, candidate_norm, existing_norm).ratio() >= threshold:
+                return True
+        return False
+
+    def _update_shared_mechanisms(self) -> None:
+        if not self._shared_mechanism_memory_enabled():
+            return
+        confirmed_rules = self._extract_confirmed_rules(self.reflection_memory)
+        if not confirmed_rules:
+            return
+        path = self._shared_mechanism_memory_path()
+        try:
+            with self._shared_mechanism_lock:
+                try:
+                    with open(path, "r", encoding="utf-8") as memory_file:
+                        existing = memory_file.read()
+                except OSError:
+                    existing = ""
+                new_lines = [
+                    rule
+                    for rule in confirmed_rules
+                    if not self._is_similar_to_existing(rule, existing)
+                ]
+                if not new_lines:
+                    return
+                lines = [line for line in existing.splitlines() if line.strip()]
+                lines.extend(new_lines)
+                # FIFO: drop the oldest lines first once the total size is
+                # over budget, so the file can't grow without bound across a
+                # long multi-game submission.
+                while lines and sum(len(line) + 1 for line in lines) > self.MAX_SHARED_MECHANISM_CHARS:
+                    lines.pop(0)
+                combined = "\n".join(lines)
+                memory_dir = os.path.dirname(path)
+                if memory_dir:
+                    os.makedirs(memory_dir, exist_ok=True)
+                temp_path = path + ".tmp"
+                with open(temp_path, "w", encoding="utf-8") as memory_file:
+                    memory_file.write(combined + "\n")
+                os.replace(temp_path, path)
+                self.shared_mechanisms = combined
+        except OSError as exc:
+            logger.warning("Failed to update shared mechanism memory: %s", exc)
 
     @classmethod
     def _global_deadline(cls) -> float:
@@ -733,6 +844,12 @@ class MyAgent(Agent):
                 separators=(",", ":"),
             )
             frame_descriptor_block = f"\n\nCurrent frame descriptor:\n{frame_descriptor}"
+        shared_mechanism_block = ""
+        if self.shared_mechanisms:
+            shared_mechanism_block = (
+                "\n\nCross-game notes (unverified in this game, treat as hints,"
+                f" not facts):\n{self.shared_mechanisms[: self.MAX_SHARED_MECHANISM_PROMPT_CHARS]}"
+            )
         confidence_instruction = ""
         if self._confidence_prompt_enabled():
             confidence_instruction = (
@@ -758,7 +875,7 @@ class MyAgent(Agent):
             Ineffective in this exact state: {ineffective_actions}
 
             Reflection memory (authoritative but revisable):
-            {self.reflection_memory}
+            {self.reflection_memory}{shared_mechanism_block}
 
             Recent transitions:
             {recent_history}{frame_descriptor_block}
@@ -1496,6 +1613,12 @@ class MyAgent(Agent):
                 "\n\nEarlier significant events this game (level-ups and "
                 f"genuinely new states, may be from prior levels):\n{significant_history}"
             )
+        shared_mechanism_block = ""
+        if self.shared_mechanisms:
+            shared_mechanism_block = (
+                "\n\nCross-game notes (unverified in this game, treat as hints,"
+                f" not facts):\n{self.shared_mechanisms[: self.MAX_SHARED_MECHANISM_PROMPT_CHARS]}"
+            )
         return textwrap.dedent(
             f"""
             You are the reflection agent for an ARC-AGI-3 game. Review the previous
@@ -1520,7 +1643,7 @@ class MyAgent(Agent):
             ## Avoid
 
             Previous memory:
-            {self.reflection_memory}
+            {self.reflection_memory}{shared_mechanism_block}
 
             Current level: {int(latest_frame.levels_completed) + 1}
             Completed transitions:
@@ -1562,6 +1685,10 @@ class MyAgent(Agent):
             return
         # A reflection may revise the goal, so discard any stale queued plan.
         self.pending_actions = []
+        # Pick up anything another concurrently-running game confirmed since
+        # this instance last loaded it (Swarm runs one thread per game
+        # against the same process), before this game's own prompt is built.
+        self.shared_mechanisms = self._load_shared_mechanisms()
         prompt = self._build_reflection_prompt(latest_frame)
         # Never exceed the server's --limit-mm-per-prompt image cap; the older
         # transitions are already summarised as text in the reflection prompt.
@@ -1594,6 +1721,7 @@ class MyAgent(Agent):
                     "[FALSIFIED] tags",
                     self.game_id,
                 )
+            self._update_shared_mechanisms()
             logger.info(
                 "Reflection completed for %s after %s transitions; memory=%s",
                 self.game_id,
