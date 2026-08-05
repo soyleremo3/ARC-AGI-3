@@ -212,6 +212,19 @@ class MyAgent(Agent):
         return max(0.0, cls._global_deadline() - time.monotonic())
 
     @classmethod
+    def _global_time_budget_fraction_remaining(cls) -> float:
+        """1.0 at submission start, 0.0 at the global deadline.
+
+        Reuses _global_deadline (already limit-minus-reserve) so this stays
+        consistent with is_done's own budget accounting instead of
+        recomputing the window a second way.
+        """
+        total_window = cls._global_deadline() - _SUBMISSION_STARTED_AT
+        if total_window <= 0:
+            return 0.0
+        return max(0.0, min(1.0, cls._remaining_global_seconds() / total_window))
+
+    @classmethod
     def _load_vllm_once(cls) -> None:
         if cls._client is not None and cls._served_model is not None:
             return
@@ -761,6 +774,34 @@ class MyAgent(Agent):
         value = os.getenv(name, default).strip().lower()
         return value in {"1", "true", "yes", "on"}
 
+    def _adaptive_max_new_tokens(self, base_budget: int) -> int:
+        """Scale the main action-generation token budget by remaining time.
+
+        Off by default (LLM_ADAPTIVE_TOKEN_BUDGET=0) so it never changes
+        behaviour unless explicitly enabled. _action_candidate_count already
+        establishes the precedent of cutting an expensive feature once the
+        budget gets tight (dropping to 1 candidate under
+        LLM_CANDIDATE_MIN_SECONDS) -- this generalises the same idea to
+        token count instead of candidate count.
+        """
+        if not self._env_flag("LLM_ADAPTIVE_TOKEN_BUDGET", "0"):
+            return base_budget
+        fraction_remaining = self._global_time_budget_fraction_remaining()
+        high_fraction, low_fraction = 0.50, 0.15
+        low_scale = 0.60
+        if fraction_remaining >= high_fraction:
+            scale = 1.0
+        elif fraction_remaining <= low_fraction:
+            scale = low_scale
+        else:
+            span = high_fraction - low_fraction
+            t = (fraction_remaining - low_fraction) / span
+            scale = low_scale + t * (1.0 - low_scale)
+        # Never scale below REPAIR_MAX_NEW_TOKENS: a budget that's too small
+        # to hold a valid JSON action truncates output on every call and
+        # feeds the repair loop instead of saving time.
+        return max(self.REPAIR_MAX_NEW_TOKENS, int(base_budget * scale))
+
     def _include_frame_descriptor(self) -> bool:
         return self._env_flag("LLM_INCLUDE_FRAME_DESCRIPTOR", "1")
 
@@ -1109,6 +1150,11 @@ class MyAgent(Agent):
         token_budget = max_new_tokens or int(
             os.getenv("LLM_MAX_NEW_TOKENS", str(self.MAX_NEW_TOKENS))
         )
+        if max_new_tokens is None:
+            # Only the main action-generation call omits max_new_tokens;
+            # repair/reflection/arbiter calls pass their own explicit budget
+            # and are intentionally left untouched by this.
+            token_budget = self._adaptive_max_new_tokens(token_budget)
         content: list[dict[str, Any]] = []
         for frame_image in frame_images:
             image_buffer = io.BytesIO()
