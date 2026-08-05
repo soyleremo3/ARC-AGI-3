@@ -1422,7 +1422,12 @@ class MyAgent(Agent):
             animation, or UI, so do not assume translation.
 
             Keep only evidence-supported, useful conclusions. Correct stale beliefs.
-            Distinguish confirmed rules from hypotheses and state a concrete next goal.
+            Under ## Rules, tag each item [CONFIRMED] (supported by multiple
+            transitions), [HYPOTHESIS] (a single observation or inference), or
+            [FALSIFIED] (contradicted by recent transitions, no longer trusted).
+            Before keeping a [HYPOTHESIS] from previous memory, check whether the
+            last transitions confirm or contradict it; if contradicted, mark it
+            [FALSIFIED] and say what changed. State a concrete next goal.
             Return only a compact Markdown document under {self.MAX_REFLECTION_CHARS}
             characters with exactly these headings:
 
@@ -1493,6 +1498,20 @@ class MyAgent(Agent):
             self.reflection_memory = self._clean_reflection_markdown(response)
             self._save_reflection_memory()
             self.reflections_completed += 1
+            if not any(
+                tag in self.reflection_memory
+                for tag in ("[CONFIRMED]", "[HYPOTHESIS]", "[FALSIFIED]")
+            ):
+                # Observability only -- the tagging instruction in
+                # _build_reflection_prompt is a nudge, not a hard-gate (Tycho's
+                # own data shows forcing a rigid trigger rule underperforms
+                # leaving the model discretion), so a missing tag never blocks
+                # or rewrites the reflection, it's just worth knowing about.
+                logger.info(
+                    "Reflection for %s produced no [CONFIRMED]/[HYPOTHESIS]/"
+                    "[FALSIFIED] tags",
+                    self.game_id,
+                )
             logger.info(
                 "Reflection completed for %s after %s transitions; memory=%s",
                 self.game_id,
@@ -1926,31 +1945,37 @@ class MyAgent(Agent):
             return {"height": 0, "width": 0, "colors": {}}
         height = len(grid)
         width = max((len(row) for row in grid), default=0)
+        components_by_colour = self._connected_components(grid)
         colors: dict[str, dict[str, Any]] = {}
-        for y, row in enumerate(grid):
-            for x, value in enumerate(row):
-                color = int(value)
-                if color == 0:
-                    continue
-                key = str(color)
-                item = colors.setdefault(
-                    key,
-                    {"count": 0, "bbox": [x, y, x, y], "sample": []},
-                )
-                item["count"] += 1
-                bbox = item["bbox"]
-                bbox[0] = min(bbox[0], x)
-                bbox[1] = min(bbox[1], y)
-                bbox[2] = max(bbox[2], x)
-                bbox[3] = max(bbox[3], y)
-                if len(item["sample"]) < 6:
-                    item["sample"].append([x, y])
+        for colour, colour_components in components_by_colour.items():
+            if not colour_components:
+                continue
+            bbox = [
+                min(comp["min_x"] for comp in colour_components),
+                min(comp["min_y"] for comp in colour_components),
+                max(comp["max_x"] for comp in colour_components),
+                max(comp["max_y"] for comp in colour_components),
+            ]
+            areas = sorted((comp["area"] for comp in colour_components), reverse=True)
+            colors[str(colour)] = {
+                "count": sum(areas),
+                "bbox": bbox,
+                "sample": [
+                    [comp["centroid_x"], comp["centroid_y"]] for comp in colour_components[:6]
+                ],
+                "components": len(colour_components),
+                "component_areas": areas[:6],
+            }
         top_colors = sorted(colors.items(), key=lambda pair: pair[1]["count"], reverse=True)[:10]
-        return {
+        descriptor: dict[str, Any] = {
             "height": height,
             "width": width,
             "nonzero_colors": {key: value for key, value in top_colors},
         }
+        adjacency = self._component_adjacency(components_by_colour)
+        if adjacency:
+            descriptor["adjacent_component_pairs"] = adjacency[:12]
+        return descriptor
 
     def _is_action_available(self, latest_frame: FrameData, action: GameAction) -> bool:
         available_actions = latest_frame.available_actions or []
@@ -2018,15 +2043,16 @@ class MyAgent(Agent):
         )
         return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:16]
 
-    def _state_abstraction(self, frame_3d: list[list[list[Any]]]) -> str:
-        """Coarse layout key that survives animations and step counters.
+    @staticmethod
+    def _connected_components(
+        grid: list[list[Any]],
+    ) -> dict[int, list[dict[str, int]]]:
+        """4-connected flood-fill components, grouped by non-zero colour.
 
-        Per-colour connected components, keyed by colour, area bucket and a
-        quantised centroid. A blinking pixel or a ticking digit perturbs the
-        exact frame hash on every step but leaves this key stable, which is
-        what lets failed-action memory accumulate across a level.
+        Shared by `_state_abstraction` (its stable per-colour layout key) and
+        `_frame_descriptor` (the prompt-facing segmentation summary) so the
+        two never drift into two different definitions of "component".
         """
-        grid = self._comparison_grid(frame_3d[-1] if frame_3d else [])
         by_colour: dict[int, set[tuple[int, int]]] = {}
         for y, row in enumerate(grid):
             for x, value in enumerate(row):
@@ -2037,12 +2063,13 @@ class MyAgent(Agent):
                 if colour != 0:
                     by_colour.setdefault(colour, set()).add((x, y))
 
-        descriptors: list[tuple[int, int, int, int]] = []
+        components: dict[int, list[dict[str, int]]] = {}
         for colour, points in by_colour.items():
             remaining = set(points)
+            colour_components: list[dict[str, int]] = []
             while remaining:
                 stack = [remaining.pop()]
-                cells = []
+                cells: list[tuple[int, int]] = []
                 while stack:
                     x, y = stack.pop()
                     cells.append((x, y))
@@ -2051,13 +2078,85 @@ class MyAgent(Agent):
                             remaining.discard(neighbour)
                             stack.append(neighbour)
                 area = len(cells)
+                xs = [x for x, _ in cells]
+                ys = [y for _, y in cells]
+                colour_components.append(
+                    {
+                        "area": area,
+                        "min_x": min(xs),
+                        "min_y": min(ys),
+                        "max_x": max(xs),
+                        "max_y": max(ys),
+                        "centroid_x": sum(xs) // area,
+                        "centroid_y": sum(ys) // area,
+                    }
+                )
+            components[colour] = colour_components
+        return components
+
+    @staticmethod
+    def _component_adjacency(
+        components_by_colour: dict[int, list[dict[str, int]]],
+        margin: int = 2,
+    ) -> list[dict[str, int]]:
+        """Component pairs whose bounding boxes come within `margin` pixels.
+
+        A cheap bbox-gap proxy for "these two shapes are near each other" --
+        not a real pixel distance, but good enough to hint the model at
+        possible contact/interaction without a full geometry computation.
+        """
+        flat: list[tuple[int, dict[str, int]]] = [
+            (colour, comp)
+            for colour, comps in components_by_colour.items()
+            for comp in comps
+        ]
+        pairs: list[dict[str, int]] = []
+        for i in range(len(flat)):
+            colour_a, comp_a = flat[i]
+            for j in range(i + 1, len(flat)):
+                colour_b, comp_b = flat[j]
+                gap_x = max(
+                    comp_a["min_x"] - comp_b["max_x"],
+                    comp_b["min_x"] - comp_a["max_x"],
+                    0,
+                )
+                gap_y = max(
+                    comp_a["min_y"] - comp_b["max_y"],
+                    comp_b["min_y"] - comp_a["max_y"],
+                    0,
+                )
+                if gap_x <= margin and gap_y <= margin:
+                    pairs.append(
+                        {"color_a": colour_a, "color_b": colour_b, "gap": max(gap_x, gap_y)}
+                    )
+        pairs.sort(key=lambda pair: pair["gap"])
+        return pairs
+
+    def _state_abstraction(self, frame_3d: list[list[list[Any]]]) -> str:
+        """Coarse layout key that survives animations and step counters.
+
+        Per-colour connected components, keyed by colour, area bucket and a
+        quantised centroid. A blinking pixel or a ticking digit perturbs the
+        exact frame hash on every step but leaves this key stable, which is
+        what lets failed-action memory accumulate across a level.
+        """
+        grid = self._comparison_grid(frame_3d[-1] if frame_3d else [])
+        components_by_colour = self._connected_components(grid)
+
+        descriptors: list[tuple[int, int, int, int]] = []
+        for colour, colour_components in components_by_colour.items():
+            for comp in colour_components:
+                area = comp["area"]
                 if area < 2:
                     # Single stray pixels are usually cursors or UI noise.
                     continue
-                centroid_x = sum(x for x, _ in cells) // area
-                centroid_y = sum(y for _, y in cells) // area
                 descriptors.append(
-                    (colour, self._area_bucket(area), centroid_x // 2, centroid_y // 2)
+                    (
+                        colour,
+                        self._area_bucket(area),
+                        comp["centroid_x"] // 2,
+                        comp["centroid_y"] // 2,
+                    )
                 )
 
         payload = json.dumps(sorted(descriptors), separators=(",", ":"))
