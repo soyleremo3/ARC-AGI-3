@@ -2331,6 +2331,7 @@ class MyAgent(Agent):
     def _component_adjacency(
         components_by_colour: dict[int, list[dict[str, int]]],
         margin: int = 2,
+        max_components: int = 150,
     ) -> list[dict[str, int]]:
         """Component pairs whose bounding boxes come within `margin` pixels.
 
@@ -2343,6 +2344,14 @@ class MyAgent(Agent):
             for colour, comps in components_by_colour.items()
             for comp in comps
         ]
+        if len(flat) > max_components:
+            # All-pairs below is O(n^2); a noisy/checkerboard-textured frame
+            # can produce thousands of single-pixel "components" (measured:
+            # ~5.3s for a full 64x64 checkerboard, unbounded). Keep only the
+            # largest -- most likely to be actual game objects rather than
+            # noise -- so a single step can never blow the time budget.
+            flat.sort(key=lambda item: item[1]["area"], reverse=True)
+            flat = flat[:max_components]
         pairs: list[dict[str, int]] = []
         for i in range(len(flat)):
             colour_a, comp_a = flat[i]
