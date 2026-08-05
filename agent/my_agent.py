@@ -799,17 +799,35 @@ class MyAgent(Agent):
         except Exception as exc:
             logger.warning("vLLM action generation failed: %s", exc)
             traceback.print_exc()
-            action = self._fallback_action(latest_frame, f"vLLM failure: {exc}")
-            if not self.history or self.history[-1].get("step") != self.action_counter:
-                self._remember_step(
-                    latest_frame,
-                    action,
-                    response_text or "FALLBACK_AFTER_VLLM_FAILURE",
-                    {
-                        "reasoning": "Fallback after model or JSON failure.",
-                        "plan_summary": f"Fallback action after error: {exc}",
-                    },
+            try:
+                action = self._fallback_action(latest_frame, f"vLLM failure: {exc}")
+                if not self.history or self.history[-1].get("step") != self.action_counter:
+                    self._remember_step(
+                        latest_frame,
+                        action,
+                        response_text or "FALLBACK_AFTER_VLLM_FAILURE",
+                        {
+                            "reasoning": "Fallback after model or JSON failure.",
+                            "plan_summary": f"Fallback action after error: {exc}",
+                        },
+                    )
+            except Exception as fallback_exc:
+                # _fallback_action is the last line of defense; if it also
+                # raises (malformed frame, corrupted internal bookkeeping),
+                # an uncaught exception here takes the whole submission down
+                # instead of just this one step. RESET bypasses availability
+                # checks entirely (see is_done/choose_action's action_counter
+                # == 0 handling), so it's the one action every state accepts.
+                logger.error(
+                    "Fallback action generation also failed for %s: %s",
+                    self.game_id,
+                    fallback_exc,
                 )
+                action = GameAction.RESET
+                action.reasoning = {
+                    "fallback": True,
+                    "reason": f"vLLM failure ({exc}) and fallback failure ({fallback_exc})",
+                }
             return action
 
     def _build_prompt(self, frames: list[FrameData], latest_frame: FrameData) -> str:
