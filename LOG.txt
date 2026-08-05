@@ -1,0 +1,430 @@
+4.2s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+4.2s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+4.2s 3 0.00s - to python to disable frozen modules.
+4.2s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+4.5s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+4.5s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+4.5s 7 0.00s - to python to disable frozen modules.
+4.5s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+5.3s 9 ARC model profile: gemma31b_public_single
+5.3s 10 vLLM model path: /kaggle/input/models/google/gemma-4/transformers/gemma-4-31b-it/1
+6.5s 11 /tmp/ipykernel_65/1669894002.py:27: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.
+6.5s 12 tar.extractall(extract_root)
+6.5s 13 
+6.5s 14 /tmp/ipykernel_65/1669894002.py:27: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.
+6.5s 15 tar.extractall(extract_root)
+48.3s 16 Extracted vLLM wheelhouse from /kaggle/input/vllm-0-23-0-tf5-wheelhouse/wheels.tar.gz
+48.7s 17 Using Python 3.12.13 environment at: /usr
+48.9s 18 Using Python 3.12.13 environment at: /usr
+48.9s 19 
+48.9s 20 Using Python 3.12.13 environment at: /usr
+48.9s 21 Resolved 191 packages in 157ms
+49.2s 22 Resolved 191 packages in 157ms
+49.2s 23 
+49.2s 24 Resolved 191 packages in 157ms
+53.1s 25 Prepared 78 packages in 4.09s
+53.3s 26 Prepared 78 packages in 4.09s
+53.3s 27 
+53.3s 28 Prepared 78 packages in 4.09s
+54.1s 29 Uninstalled 19 packages in 1.04s
+54.3s 30 Uninstalled 19 packages in 1.04s
+54.3s 31 
+54.3s 32 Uninstalled 19 packages in 1.04s
+54.3s 33 Installed 78 packages in 238ms
+54.3s 34 + anthropic==0.113.0
+54.3s 35 + apache-tvm-ffi==0.1.9
+54.3s 36 + astor==0.8.1
+54.3s 37 + cbor2==6.1.2
+54.3s 38 + compressed-tensors==0.17.0
+54.3s 39 - cuda-bindings==13.2.0
+54.3s 40 + cuda-bindings==12.9.7
+54.3s 41 + cuda-tile==1.3.0
+54.3s 42 + depyf==0.20.0
+54.3s 43 + detect-installer==0.1.0
+54.3s 44 + diskcache==5.6.3
+54.3s 45 + fastapi-cli==0.0.27
+54.3s 46 + fastapi-cloud-cli==0.21.0
+54.3s 47 + fastar==0.11.0
+54.3s 48 + fastsafetensors==0.3.2
+54.3s 49 + flashinfer-cubin==0.6.12
+54.3s 50 + flashinfer-python==0.6.12
+54.3s 51 + gguf==0.19.0
+54.3s 52 + humming-kernels==0.1.4
+54.3s 53 + ijson==3.5.0
+54.3s 54 + interegular==0.3.3
+54.3s 55 - lark==1.3.1
+54.3s 56 + lark==1.2.2
+54.3s 57 + llguidance==1.7.6
+54.3s 58 + lm-format-enforcer==0.11.3
+54.3s 59 + loguru==0.7.3
+54.3s 60 + mistral-common==1.11.5
+54.3s 61 + model-hosting-container-standards==0.1.16
+54.3s 62 + msgspec==0.21.1
+54.3s 63 - numba==0.65.1
+54.3s 64 + numba==0.65.0
+54.3s 65 - numpy==2.4.6
+54.3s 66 + numpy==2.3.5
+54.3s 67 + nvidia-cuda-cccl==13.3.3.4.1
+54.3s 68 + nvidia-cuda-crt==13.3.73
+54.3s 69 + nvidia-cuda-nvcc==13.2.78
+54.3s 70 + nvidia-cuda-nvrtc==13.3.33
+54.3s 71 + nvidia-cuda-runtime==13.3.29
+54.3s 72 + nvidia-cuda-tileiras==13.2.78
+54.3s 73 - nvidia-cudnn-cu12==9.10.2.21
+54.3s 74 + nvidia-cudnn-cu12==9.19.0.56
+54.3s 75 + nvidia-cudnn-frontend==1.25.0
+54.3s 76 + nvidia-cutlass-dsl==4.5.2
+54.3s 77 + nvidia-cutlass-dsl-libs-base==4.5.2
+54.3s 78 + nvidia-cutlass-dsl-libs-cu13==4.5.2
+54.3s 79 - nvidia-nccl-cu12==2.27.5
+54.3s 80 + nvidia-nccl-cu12==2.28.9
+54.3s 81 + nvidia-nvvm==13.2.78
+54.3s 82 + openai-harmony==0.0.8
+54.3s 83 - opentelemetry-api==1.38.0
+54.3s 84 + opentelemetry-api==1.43.0
+54.3s 85 + opentelemetry-exporter-otlp==1.43.0
+54.3s 86 - opentelemetry-exporter-otlp-proto-common==1.38.0
+54.3s 87 + opentelemetry-exporter-otlp-proto-common==1.43.0
+54.3s 88 + opentelemetry-exporter-otlp-proto-grpc==1.43.0
+54.3s 89 - opentelemetry-exporter-otlp-proto-http==1.38.0
+54.3s 90 + opentelemetry-exporter-otlp-proto-http==1.43.0
+54.3s 91 - opentelemetry-proto==1.38.0
+54.3s 92 + opentelemetry-proto==1.43.0
+54.3s 93 - opentelemetry-sdk==1.38.0
+54.3s 94 + opentelemetry-sdk==1.43.0
+54.3s 95 - opentelemetry-semantic-conventions==0.59b0
+54.3s 96 + opentelemetry-semantic-conventions==0.64b0
+54.3s 97 + opentelemetry-semantic-conventions-ai==0.5.1
+54.3s 98 + outlines-core==0.2.14
+54.3s 99 + partial-json-parser==0.2.1.1.post7
+54.3s 100 + prometheus-fastapi-instrumentator==8.0.2
+54.3s 101 - protobuf==5.29.5
+54.3s 102 + protobuf==7.35.1
+54.3s 103 + pybase64==1.4.3
+54.3s 104 + pycountry==26.2.16
+54.3s 105 + pydantic-extra-types==2.11.1
+54.3s 106 + pyelftools==0.33
+54.3s 107 + quack-kernels==0.5.0
+54.3s 108 + rich-toolkit==0.20.1
+54.3s 109 + rignore==0.7.6
+54.3s 110 + setproctitle==1.3.7
+54.3s 111 - setuptools==75.2.0
+54.3s 112 + setuptools==80.10.2
+54.3s 113 - starlette==0.52.1
+54.3s 114 + starlette==1.3.1
+54.3s 115 + supervisor==4.3.0
+54.3s 116 + tilelang==0.1.9
+54.3s 117 + tokenspeed-mla==0.1.2
+54.3s 118 + tokenspeed-triton==3.7.10.post20260531
+54.3s 119 - torch==2.10.0+cu128
+54.3s 120 + torch==2.11.0+cu128
+54.3s 121 + torch-c-dlpack-ext==0.1.5
+54.3s 122 - torchaudio==2.10.0+cu128
+54.3s 123 + torchaudio==2.11.0+cu128
+54.3s 124 - torchvision==0.25.0+cu128
+54.3s 125 + torchvision==0.26.0+cu128
+54.3s 126 - transformers==5.0.0
+54.3s 127 + transformers==5.12.1
+54.3s 128 + vllm==0.23.0
+54.3s 129 + xgrammar==0.2.3
+54.3s 130 + z3-solver==4.15.4.0
+54.3s 131 Installed vLLM from /tmp/vllm_0230_offline/wheels
+54.3s 132 Installed 78 packages in 238ms
+54.3s 133 + anthropic==0.113.0
+54.3s 134 + apache-tvm-ffi==0.1.9
+54.3s 135 + astor==0.8.1
+54.3s 136 + cbor2==6.1.2
+54.3s 137 + compressed-tensors==0.17.0
+54.3s 138 - cuda-bindings==13.2.0
+54.3s 139 + cuda-bindings==12.9.7
+54.3s 140 + cuda-tile==1.3.0
+54.3s 141 + depyf==0.20.0
+54.3s 142 + detect-installer==0.1.0
+54.3s 143 + diskcache==5.6.3
+54.3s 144 + fastapi-cli==0.0.27
+54.3s 145 + fastapi-cloud-cli==0.21.0
+54.3s 146 + fastar==0.11.0
+54.3s 147 + fastsafetensors==0.3.2
+54.3s 148 + flashinfer-cubin==0.6.12
+54.3s 149 + flashinfer-python==0.6.12
+54.3s 150 + gguf==0.19.0
+54.3s 151 + humming-kernels==0.1.4
+54.3s 152 + ijson==3.5.0
+54.3s 153 + interegular==0.3.3
+54.3s 154 - lark==1.3.1
+54.3s 155 + lark==1.2.2
+54.3s 156 + llguidance==1.7.6
+54.3s 157 + lm-format-enforcer==0.11.3
+54.3s 158 + loguru==0.7.3
+54.3s 159 + mistral-common==1.11.5
+54.3s 160 + model-hosting-container-standards==0.1.16
+54.3s 161 + msgspec==0.21.1
+54.3s 162 - numba==0.65.1
+54.3s 163 + numba==0.65.0
+54.3s 164 - numpy==2.4.6
+54.3s 165 + numpy==2.3.5
+54.3s 166 + nvidia-cuda-cccl==13.3.3.4.1
+54.3s 167 + nvidia-cuda-crt==13.3.73
+54.3s 168 + nvidia-cuda-nvcc==13.2.78
+54.3s 169 + nvidia-cuda-nvrtc==13.3.33
+54.3s 170 + nvidia-cuda-runtime==13.3.29
+54.3s 171 + nvidia-cuda-tileiras==13.2.78
+54.3s 172 - nvidia-cudnn-cu12==9.10.2.21
+54.3s 173 + nvidia-cudnn-cu12==9.19.0.56
+54.3s 174 + nvidia-cudnn-frontend==1.25.0
+54.3s 175 + nvidia-cutlass-dsl==4.5.2
+54.3s 176 + nvidia-cutlass-dsl-libs-base==4.5.2
+54.3s 177 + nvidia-cutlass-dsl-libs-cu13==4.5.2
+54.3s 178 - nvidia-nccl-cu12==2.27.5
+54.3s 179 + nvidia-nccl-cu12==2.28.9
+54.3s 180 + nvidia-nvvm==13.2.78
+54.3s 181 + openai-harmony==0.0.8
+54.3s 182 - opentelemetry-api==1.38.0
+54.3s 183 + opentelemetry-api==1.43.0
+54.3s 184 + opentelemetry-exporter-otlp==1.43.0
+54.3s 185 - opentelemetry-exporter-otlp-proto-common==1.38.0
+54.3s 186 + opentelemetry-exporter-otlp-proto-common==1.43.0
+54.3s 187 + opentelemetry-exporter-otlp-proto-grpc==1.43.0
+54.3s 188 - opentelemetry-exporter-otlp-proto-http==1.38.0
+54.3s 189 + opentelemetry-exporter-otlp-proto-http==1.43.0
+54.3s 190 - opentelemetry-proto==1.38.0
+54.3s 191 + opentelemetry-proto==1.43.0
+54.3s 192 - opentelemetry-sdk==1.38.0
+54.3s 193 + opentelemetry-sdk==1.43.0
+54.3s 194 - opentelemetry-semantic-conventions==0.59b0
+54.3s 195 + opentelemetry-semantic-conventions==0.64b0
+54.3s 196 + opentelemetry-semantic-conventions-ai==0.5.1
+54.3s 197 + outlines-core==0.2.14
+54.3s 198 + partial-json-parser==0.2.1.1.post7
+54.3s 199 + prometheus-fastapi-instrumentator==8.0.2
+54.3s 200 - protobuf==5.29.5
+54.3s 201 + protobuf==7.35.1
+54.3s 202 + pybase64==1.4.3
+54.3s 203 + pycountry==26.2.16
+54.3s 204 + pydantic-extra-types==2.11.1
+54.3s 205 + pyelftools==0.33
+54.3s 206 + quack-kernels==0.5.0
+54.3s 207 + rich-toolkit==0.20.1
+54.3s 208 + rignore==0.7.6
+54.3s 209 + setproctitle==1.3.7
+54.3s 210 - setuptools==75.2.0
+54.3s 211 + setuptools==80.10.2
+54.3s 212 - starlette==0.52.1
+54.3s 213 + starlette==1.3.1
+54.3s 214 + supervisor==4.3.0
+54.3s 215 + tilelang==0.1.9
+54.3s 216 + tokenspeed-mla==0.1.2
+54.3s 217 + tokenspeed-triton==3.7.10.post20260531
+54.3s 218 - torch==2.10.0+cu128
+54.3s 219 + torch==2.11.0+cu128
+54.3s 220 + torch-c-dlpack-ext==0.1.5
+54.3s 221 - torchaudio==2.10.0+cu128
+54.3s 222 + torchaudio==2.11.0+cu128
+54.3s 223 - torchvision==0.25.0+cu128
+54.3s 224 + torchvision==0.26.0+cu128
+54.3s 225 - transformers==5.0.0
+54.3s 226 + transformers==5.12.1
+54.3s 227 + vllm==0.23.0
+54.3s 228 + xgrammar==0.2.3
+54.3s 229 + z3-solver==4.15.4.0
+54.3s 230 
+54.3s 231 Installed 78 packages in 238ms
+54.3s 232 + anthropic==0.113.0
+54.3s 233 + apache-tvm-ffi==0.1.9
+54.3s 234 + astor==0.8.1
+54.3s 235 + cbor2==6.1.2
+54.3s 236 + compressed-tensors==0.17.0
+54.3s 237 - cuda-bindings==13.2.0
+54.3s 238 + cuda-bindings==12.9.7
+54.3s 239 + cuda-tile==1.3.0
+54.3s 240 + depyf==0.20.0
+54.3s 241 + detect-installer==0.1.0
+54.3s 242 + diskcache==5.6.3
+54.3s 243 + fastapi-cli==0.0.27
+54.3s 244 + fastapi-cloud-cli==0.21.0
+54.3s 245 + fastar==0.11.0
+54.3s 246 + fastsafetensors==0.3.2
+54.3s 247 + flashinfer-cubin==0.6.12
+54.3s 248 + flashinfer-python==0.6.12
+54.3s 249 + gguf==0.19.0
+54.3s 250 + humming-kernels==0.1.4
+54.3s 251 + ijson==3.5.0
+54.3s 252 + interegular==0.3.3
+54.3s 253 - lark==1.3.1
+54.3s 254 + lark==1.2.2
+54.3s 255 + llguidance==1.7.6
+54.3s 256 + lm-format-enforcer==0.11.3
+54.4s 257 + loguru==0.7.3
+54.4s 258 + mistral-common==1.11.5
+54.4s 259 + model-hosting-container-standards==0.1.16
+54.4s 260 + msgspec==0.21.1
+54.4s 261 - numba==0.65.1
+54.4s 262 + numba==0.65.0
+54.4s 263 - numpy==2.4.6
+54.4s 264 + numpy==2.3.5
+54.4s 265 + nvidia-cuda-cccl==13.3.3.4.1
+54.4s 266 + nvidia-cuda-crt==13.3.73
+54.4s 267 + nvidia-cuda-nvcc==13.2.78
+54.4s 268 + nvidia-cuda-nvrtc==13.3.33
+54.4s 269 + nvidia-cuda-runtime==13.3.29
+54.4s 270 + nvidia-cuda-tileiras==13.2.78
+54.4s 271 - nvidia-cudnn-cu12==9.10.2.21
+54.4s 272 + nvidia-cudnn-cu12==9.19.0.56
+54.4s 273 + nvidia-cudnn-frontend==1.25.0
+54.4s 274 + nvidia-cutlass-dsl==4.5.2
+54.4s 275 + nvidia-cutlass-dsl-libs-base==4.5.2
+54.4s 276 + nvidia-cutlass-dsl-libs-cu13==4.5.2
+54.4s 277 - nvidia-nccl-cu12==2.27.5
+54.4s 278 + nvidia-nccl-cu12==2.28.9
+54.4s 279 + nvidia-nvvm==13.2.78
+54.4s 280 + openai-harmony==0.0.8
+54.4s 281 - opentelemetry-api==1.38.0
+54.4s 282 + opentelemetry-api==1.43.0
+54.4s 283 + opentelemetry-exporter-otlp==1.43.0
+54.4s 284 - opentelemetry-exporter-otlp-proto-common==1.38.0
+54.4s 285 + opentelemetry-exporter-otlp-proto-common==1.43.0
+54.4s 286 + opentelemetry-exporter-otlp-proto-grpc==1.43.0
+54.4s 287 - opentelemetry-exporter-otlp-proto-http==1.38.0
+54.4s 288 + opentelemetry-exporter-otlp-proto-http==1.43.0
+54.4s 289 - opentelemetry-proto==1.38.0
+54.4s 290 + opentelemetry-proto==1.43.0
+54.4s 291 - opentelemetry-sdk==1.38.0
+54.4s 292 + opentelemetry-sdk==1.43.0
+54.4s 293 - opentelemetry-semantic-conventions==0.59b0
+54.4s 294 + opentelemetry-semantic-conventions==0.64b0
+54.4s 295 + opentelemetry-semantic-conventions-ai==0.5.1
+54.4s 296 + outlines-core==0.2.14
+54.4s 297 + partial-json-parser==0.2.1.1.post7
+54.4s 298 + prometheus-fastapi-instrumentator==8.0.2
+54.4s 299 - protobuf==5.29.5
+54.4s 300 + protobuf==7.35.1
+54.4s 301 + pybase64==1.4.3
+54.4s 302 + pycountry==26.2.16
+54.4s 303 + pydantic-extra-types==2.11.1
+54.4s 304 + pyelftools==0.33
+54.4s 305 + quack-kernels==0.5.0
+54.4s 306 + rich-toolkit==0.20.1
+54.4s 307 + rignore==0.7.6
+54.4s 308 + setproctitle==1.3.7
+54.4s 309 - setuptools==75.2.0
+54.4s 310 + setuptools==80.10.2
+54.4s 311 - starlette==0.52.1
+54.4s 312 + starlette==1.3.1
+54.4s 313 + supervisor==4.3.0
+54.4s 314 + tilelang==0.1.9
+54.4s 315 + tokenspeed-mla==0.1.2
+54.4s 316 + tokenspeed-triton==3.7.10.post20260531
+54.4s 317 - torch==2.10.0+cu128
+54.4s 318 + torch==2.11.0+cu128
+54.4s 319 + torch-c-dlpack-ext==0.1.5
+54.4s 320 - torchaudio==2.10.0+cu128
+54.4s 321 + torchaudio==2.11.0+cu128
+54.4s 322 - torchvision==0.25.0+cu128
+54.4s 323 + torchvision==0.26.0+cu128
+54.4s 324 - transformers==5.0.0
+54.4s 325 + transformers==5.12.1
+54.4s 326 + vllm==0.23.0
+54.4s 327 + xgrammar==0.2.3
+54.4s 328 + z3-solver==4.15.4.0
+55.9s 329 Looking in links: /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels
+55.9s 330 Processing /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels/arc_agi-0.9.8-py3-none-any.whl
+55.9s 331 Requirement already satisfied: python-dotenv in /usr/local/lib/python3.12/dist-packages (1.2.2)
+55.9s 332 Processing /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels/arcengine-0.9.3-py3-none-any.whl (from arc-agi)
+55.9s 333 Requirement already satisfied: flask>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (3.1.3)
+55.9s 334 Requirement already satisfied: matplotlib>=3.7.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (3.10.0)
+55.9s 335 Requirement already satisfied: pydantic>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (2.12.3)
+55.9s 336 Processing /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels/pillow-12.2.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from arc-agi)
+56.1s 337 Looking in links: /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels
+56.1s 338 Processing /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels/arc_agi-0.9.8-py3-none-any.whl
+56.1s 339 Requirement already satisfied: python-dotenv in /usr/local/lib/python3.12/dist-packages (1.2.2)
+56.1s 340 Processing /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels/arcengine-0.9.3-py3-none-any.whl (from arc-agi)
+56.1s 341 Requirement already satisfied: flask>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (3.1.3)
+56.1s 342 Requirement already satisfied: matplotlib>=3.7.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (3.10.0)
+56.1s 343 Requirement already satisfied: pydantic>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (2.12.3)
+56.1s 344 Processing /kaggle/input/competitions/arc-prize-2026-arc-agi-3/arc_agi_3_wheels/pillow-12.2.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from arc-agi)
+56.1s 345 Requirement already satisfied: requests>=2.31.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (2.32.4)
+56.1s 346 Requirement already satisfied: numpy>=1.24.0 in /usr/local/lib/python3.12/dist-packages (from arcengine>=0.9.3->arc-agi) (2.3.5)
+56.1s 347 Requirement already satisfied: blinker>=1.9.0 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (1.9.0)
+56.1s 348 Requirement already satisfied: click>=8.1.3 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (8.3.2)
+56.1s 349 Requirement already satisfied: itsdangerous>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (2.2.0)
+56.1s 350 Requirement already satisfied: jinja2>=3.1.2 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (3.1.6)
+56.1s 351 Requirement already satisfied: markupsafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (3.0.3)
+56.1s 352 Requirement already satisfied: werkzeug>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (3.1.8)
+56.1s 353 Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (1.3.3)
+56.1s 354 Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (0.12.1)
+56.1s 355 Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (4.62.1)
+56.1s 356 Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (1.5.0)
+56.1s 357 Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (26.2)
+56.1s 358 Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (3.3.2)
+56.1s 359 Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (2.9.0.post0)
+56.1s 360 Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (0.7.0)
+56.1s 361 Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (2.41.4)
+56.1s 362 Requirement already satisfied: typing-extensions>=4.14.1 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (4.15.0)
+56.1s 363 Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (0.4.2)
+56.1s 364 Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (3.4.7)
+56.1s 365 Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (3.11)
+56.1s 366 Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (2.5.0)
+56.1s 367 Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (2026.2.25)
+56.1s 368 Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.7->matplotlib>=3.7.0->arc-agi) (1.17.0)
+56.3s 369 Requirement already satisfied: requests>=2.31.0 in /usr/local/lib/python3.12/dist-packages (from arc-agi) (2.32.4)
+56.3s 370 Requirement already satisfied: numpy>=1.24.0 in /usr/local/lib/python3.12/dist-packages (from arcengine>=0.9.3->arc-agi) (2.3.5)
+56.3s 371 Requirement already satisfied: blinker>=1.9.0 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (1.9.0)
+56.3s 372 Requirement already satisfied: click>=8.1.3 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (8.3.2)
+56.3s 373 Requirement already satisfied: itsdangerous>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (2.2.0)
+56.3s 374 Requirement already satisfied: jinja2>=3.1.2 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (3.1.6)
+56.3s 375 Requirement already satisfied: markupsafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (3.0.3)
+56.3s 376 Requirement already satisfied: werkzeug>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from flask>=3.1.0->arc-agi) (3.1.8)
+56.3s 377 Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (1.3.3)
+56.3s 378 Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (0.12.1)
+56.3s 379 Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (4.62.1)
+56.3s 380 Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (1.5.0)
+56.3s 381 Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (26.2)
+56.3s 382 Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (3.3.2)
+56.3s 383 Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0->arc-agi) (2.9.0.post0)
+56.3s 384 Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (0.7.0)
+56.3s 385 Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (2.41.4)
+56.3s 386 Requirement already satisfied: typing-extensions>=4.14.1 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (4.15.0)
+56.3s 387 Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.0.0->arc-agi) (0.4.2)
+56.3s 388 Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (3.4.7)
+56.3s 389 Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (3.11)
+56.3s 390 Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (2.5.0)
+56.3s 391 Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0->arc-agi) (2026.2.25)
+56.3s 392 Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.7->matplotlib>=3.7.0->arc-agi) (1.17.0)
+57.0s 393 Installing collected packages: pillow, arcengine, arc-agi
+57.2s 394 Installing collected packages: pillow, arcengine, arc-agi
+63.8s 395 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+63.8s 396 ydata-profiling 4.18.4 requires numba<0.63,>=0.60, but you have numba 0.65.0 which is incompatible.
+63.8s 397 dopamine-rl 4.1.2 requires gym<=0.25.2, but you have gym 0.26.2 which is incompatible.
+63.8s 398 gradio 5.50.0 requires pillow<12.0,>=8.0, but you have pillow 12.2.0 which is incompatible.
+63.8s 399 gradio 5.50.0 requires starlette<1.0,>=0.40.0, but you have starlette 1.3.1 which is incompatible.
+63.8s 400 Successfully installed arc-agi-0.9.8 arcengine-0.9.3 pillow-12.2.0
+63.8s 401 Successfully installed arc-agi-0.9.8 arcengine-0.9.3 pillow-12.2.0
+63.8s 402 Pillow import OK: 11.3.0
+63.8s 403 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+63.8s 404 ydata-profiling 4.18.4 requires numba<0.63,>=0.60, but you have numba 0.65.0 which is incompatible.
+63.8s 405 dopamine-rl 4.1.2 requires gym<=0.25.2, but you have gym 0.26.2 which is incompatible.
+63.8s 406 gradio 5.50.0 requires pillow<12.0,>=8.0, but you have pillow 12.2.0 which is incompatible.
+63.8s 407 gradio 5.50.0 requires starlette<1.0,>=0.40.0, but you have starlette 1.3.1 which is incompatible.
+63.8s 408 
+63.8s 409 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+63.8s 410 ydata-profiling 4.18.4 requires numba<0.63,>=0.60, but you have numba 0.65.0 which is incompatible.
+63.8s 411 dopamine-rl 4.1.2 requires gym<=0.25.2, but you have gym 0.26.2 which is incompatible.
+63.8s 412 gradio 5.50.0 requires pillow<12.0,>=8.0, but you have pillow 12.2.0 which is incompatible.
+63.8s 413 gradio 5.50.0 requires starlette<1.0,>=0.40.0, but you have starlette 1.3.1 which is incompatible.
+63.8s 414 Writing /tmp/my_agent.py
+65.6s 415 Smoke import OK: MyAgent
+65.6s 416 vLLM package: 0.23.0
+65.6s 417 Transformers package: 5.12.1
+65.6s 418 Starting vLLM startup smoke...
+666.5s 419 vLLM startup smoke OK: vllm-model
+669.1s 420 vLLM image generation smoke choices: 1
+701.6s 421 Gateway not available in this run: URLError(gaierror(-3, 'Temporary failure in name resolution'))
+701.6s 422 Skipping gateway/local validation; set RUN_ARC_LOCAL_VALIDATION=1 for public-suite validation.
+703.3s 423 /usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+703.3s 424 cells[i][c] = re.sub('\\\\\|', '|', cell)
+703.4s 425 /usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+703.4s 426 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+703.8s 427 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+704.0s 428 [NbConvertApp] Writing 151615 bytes to __notebook__.ipynb
+705.2s 429 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+705.7s 430 [NbConvertApp] Writing 776564 bytes to __results__.html
