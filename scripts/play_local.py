@@ -62,8 +62,15 @@ def main() -> None:
                    help="Per-game cap on actions (overrides MyAgent.MAX_ACTIONS).")
     p.add_argument("--list", action="store_true",
                    help="List available games and exit.")
-    p.add_argument("--render", default=None, choices=[None, "terminal"],
-                   help="Optional terminal rendering each step.")
+    p.add_argument(
+        "--render",
+        default=None,
+        choices=[None, "terminal", "terminal-fast", "human"],
+        help="Live rendering each step, straight from the arc-agi package: "
+             "'terminal' (ANSI colour blocks, paced at the game's own fps), "
+             "'terminal-fast' (same, no per-frame delay), or 'human' (a "
+             "matplotlib window). Omit for no rendering (fastest).",
+    )
     args = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
