@@ -14,6 +14,7 @@ import random
 import re
 import signal
 import subprocess
+import sys
 import textwrap
 import threading
 import time
@@ -62,6 +63,7 @@ class MyAgent(Agent):
     GLOBAL_SHUTDOWN_RESERVE_SECONDS = 20 * 60
     MODEL_PATH = "/kaggle/input/models/google/gemma-4/transformers/gemma-4-31b-it/1"
     MAX_HISTORY = 12
+    MAX_SIGNIFICANT_EVENTS = 50
     MAX_FRAME_MEMORY = 11
     ACTION_CONTEXT_FRAMES = 4
     REFLECTION_INTERVAL = 10
@@ -137,6 +139,11 @@ class MyAgent(Agent):
         self.pending_actions: list[dict[str, Any]] = []
         self.last_plan_summary = ""
         self.reflection_buffer: list[dict[str, Any]] = []
+        # Unlike reflection_buffer (drained into prose every REFLECTION_INTERVAL
+        # steps and then discarded), this keeps a compact record of only the
+        # rare "something actually happened" steps for the whole game, so a
+        # rule learned in level 1 isn't fully gone by level 5.
+        self.significant_events: list[dict[str, Any]] = []
         self.reflection_memory_path = self._reflection_memory_path()
         self.reflection_memory = self._load_reflection_memory()
         self.reflections_completed = 0
@@ -151,9 +158,15 @@ class MyAgent(Agent):
         self._deadline_hit = False
 
     def _reflection_memory_path(self) -> str:
+        # sys.platform check first: Kaggle's runtime is always Linux, so this
+        # never changes real submission behaviour. Without it, a leading "/"
+        # is drive-relative on Windows (no path separator translation the way
+        # Git Bash gives you), so os.path.isdir("/kaggle/working") silently
+        # matches an unrelated pre-existing C:\kaggle\working directory on a
+        # dev machine and redirects memory there instead of next to the repo.
         default_dir = (
             "/kaggle/working/agent_memory"
-            if os.path.isdir("/kaggle/working")
+            if sys.platform != "win32" and os.path.isdir("/kaggle/working")
             else os.path.join(os.getcwd(), "agent_memory")
         )
         base_dir = os.getenv("LLM_MEMORY_DIR", default_dir)
@@ -797,6 +810,15 @@ class MyAgent(Agent):
         except ValueError:
             return self.MAX_PLAN_ACTIONS
 
+    def _max_significant_events(self) -> int:
+        try:
+            return max(
+                1,
+                int(os.getenv("LLM_MAX_SIGNIFICANT_EVENTS", str(self.MAX_SIGNIFICANT_EVENTS))),
+            )
+        except ValueError:
+            return self.MAX_SIGNIFICANT_EVENTS
+
     def _generate_action_response(
         self,
         prompt: str,
@@ -1414,6 +1436,20 @@ class MyAgent(Agent):
         transitions = json.dumps(
             self.reflection_buffer[-reflection_interval :], ensure_ascii=True
         )
+        # significant_events survives the whole game (reflection_buffer gets
+        # drained every reflection_interval steps), but is only ever the rare
+        # "level advanced" / "genuinely new state" steps, so a bounded slice
+        # here stays cheap even though the underlying list can hold up to
+        # MAX_SIGNIFICANT_EVENTS entries.
+        significant_history = json.dumps(
+            self.significant_events[-20:], ensure_ascii=True
+        )
+        significant_block = ""
+        if self.significant_events:
+            significant_block = (
+                "\n\nEarlier significant events this game (level-ups and "
+                f"genuinely new states, may be from prior levels):\n{significant_history}"
+            )
         return textwrap.dedent(
             f"""
             You are the reflection agent for an ARC-AGI-3 game. Review the previous
@@ -1442,7 +1478,7 @@ class MyAgent(Agent):
 
             Current level: {int(latest_frame.levels_completed) + 1}
             Completed transitions:
-            {transitions}
+            {transitions}{significant_block}
             /no_think
             """
         ).strip()
@@ -1735,6 +1771,11 @@ class MyAgent(Agent):
             }
         )
         self.reflection_buffer.append(self._compact_history_item(previous_action))
+        if levels_delta != 0 or (previous_action["state_changed"] and not repeated_state):
+            self.significant_events.append(self._compact_history_item(previous_action))
+            max_events = self._max_significant_events()
+            if len(self.significant_events) > max_events:
+                self.significant_events = self.significant_events[-max_events:]
 
     def _compact_history_item(self, item: dict[str, Any]) -> dict[str, Any]:
         return {
