@@ -35,7 +35,7 @@ AVAILABLE_AGENTS: dict[str, Type[Agent]] = {
 def main() -> None:
     if not INIT.exists():
         raise SystemExit(f"Framework not found at {INIT}. Run `make setup` first.")
-    INIT.write_text(SLIM)
+    INIT.write_text(SLIM, encoding="utf-8")
     print(f"[slim_framework] Slimmed {INIT.relative_to(ROOT)}")
 
 
